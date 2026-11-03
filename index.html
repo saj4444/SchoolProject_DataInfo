@@ -146,7 +146,7 @@ th{color:var(--muted);}
     <div class="card advanced-only">
       <strong>নেটওয়ার্ক / IP</strong>
       <div class="datagrid" id="ipData" style="margin-top:10px;"></div>
-      <div class="note">IP-ভিত্তিক location আনুমানিক; VPN/mobile carrier/database-এর কারণে ভুল হতে পারে। ip-api.com-এর free endpoint শুধু HTTP সমর্থন করে—HTTPS-hosted page থেকে browser mixed-content policy-তে request block করতে পারে। সে ক্ষেত্রে HTTPS API বা server-side proxy দরকার। HTTP encrypted নয়।</div>
+      <div class="note">IP-ভিত্তিক location আনুমানিক; VPN/mobile carrier/database-এর কারণে ভুল হতে পারে। HTTPS পেজে HTTPS API ব্যবহার করা হয়; সম্মতিতে provider তোমার public IP পাবে.</div>
       <button id="ipLookupButton" class="btn btn-outline" onclick="lookupIP()">🔄 IP lookup আবার চেষ্টা করো</button>
     </div>
 
@@ -572,7 +572,7 @@ function loadDeviceData(){
     document.getElementById('deviceData').innerHTML = row('ত্রুটি','ডেটা লোড করা যায়নি');
   }
 
-  document.getElementById('ipData').innerHTML = row('IP Address','সম্মতির পর lookup হবে','IP সরাসরি browser API থেকে পাওয়া যায় না; সম্মতি দিলে ipwho.is-এর কাছে request পাঠানো হয়।');
+  document.getElementById('ipData').innerHTML = row('IP Address','সম্মতির পর lookup হবে','IP সরাসরি browser API থেকে পাওয়া যায় না; সম্মতি দিলে HTTPS IP lookup service-এর কাছে request পাঠানো হয়।');
   loadExtraData();
   if(consentMode==='full')loadMediaData();
   updateJsonPreview();
@@ -683,73 +683,37 @@ function updateLocationPermission(){
 function lookupIP(){
   if(consentMode!=='full')return;
   const button=document.getElementById('ipLookupButton');
-  if(window.location.protocol==='https:'){
-    ipLocationResult='পাওয়া যায়নি (free ip-api endpoint HTTPS সমর্থন করে না)';
-    ipApiResult={status:'unavailable',message:'ip-api.com free endpoint uses HTTP. HTTPS pages need an HTTPS-enabled plan or a same-origin server-side proxy.'};
-    document.getElementById('ipData').innerHTML=row('Lookup করা যায়নি','এই পেজ HTTPS-এ চলছে','ip-api.com-এর free endpoint HTTP-only; HTTPS page থেকে mixed-content request browser block করে। HTTPS API বা server-side proxy লাগবে।');
-    updateJsonPreview();
-    return;
-  }
   if(Date.now()<ipApiBlockedUntil){
     const seconds=Math.ceil((ipApiBlockedUntil-Date.now())/1000);
     document.getElementById('ipData').innerHTML=row('Rate limit','পাওয়া যায়নি',`${seconds} সেকেন্ড পরে আবার চেষ্টা করো।`);
-    ipLocationResult='পাওয়া যায়নি (API rate limit)';
-    ipApiResult={status:'unavailable',message:`Rate limit active; retry in ${seconds} seconds.`};
-    updateJsonPreview();
-    return;
+    ipLocationResult='পাওয়া যায়নি (API rate limit)';ipApiResult={status:'unavailable',message:`Rate limit active; retry in ${seconds} seconds.`};updateJsonPreview();return;
   }
-  const controller=new AbortController();
-  const timeout=window.setTimeout(()=>controller.abort(),10000);
-  button.disabled=true;
-  button.textContent='⏳ IP তথ্য আনা হচ্ছে...';
-  ipLocationResult='আনা হচ্ছে...';
-  ipApiResult={status:'loading'};
-  document.getElementById('ipData').innerHTML=row('অবস্থা','তথ্য আনা হচ্ছে...','তোমার সম্মতিতে ip-api.com-এর free HTTP endpoint-এ request পাঠানো হচ্ছে; এতে provider তোমার public IP পাবে।');
-  updateJsonPreview();
-  fetch('http://ip-api.com/json/?fields=66842623&lang=en',{signal:controller.signal})
-    .then(response=>{
-      const remaining=response.headers.get('X-Rl');
-      const retryAfter=Number(response.headers.get('X-Ttl'));
-      if(remaining==='0' && Number.isFinite(retryAfter)){
-        ipApiBlockedUntil=Date.now()+retryAfter*1000;
-      }
-      if(!response.ok)throw new Error(response.status===429?'API rate limit হয়েছে; কিছুক্ষণ পরে আবার চেষ্টা করো.':`ip-api.com থেকে HTTP ${response.status} উত্তর এসেছে।`);
-      return response.json();
-    })
-    .then(data=>{
-      if(data.status!=='success')throw new Error(data.message||'IP lookup সফল হয়নি।');
-      ipApiResult=data;
-      const location=[data.city,data.regionName,data.country].filter(Boolean).join(', ')||'অঞ্চল পাওয়া যায়নি';
-      ipLocationResult=location;
-      const labels={
-        status:'Status',continent:'Continent',continentCode:'Continent code',country:'Country',
-        countryCode:'Country code',region:'Region code',regionName:'Region',city:'City',
-        district:'District',zip:'ZIP code',lat:'Latitude (IP estimate)',lon:'Longitude (IP estimate)',
-        timezone:'Timezone',offset:'UTC offset (seconds)',currency:'Currency',isp:'ISP',
-        org:'Organization',as:'AS',asname:'AS name',mobile:'Mobile connection',
-        proxy:'Proxy/VPN/Tor flag',hosting:'Hosting/data-center flag',query:'Queried IP',
-      };
-      document.getElementById('ipData').innerHTML=Object.entries(data).map(([key,value])=>{
-        const displayValue=typeof value==='boolean'?(value?'Yes':'No'):(value===''?'—':String(value));
-        return row(labels[key]||key,displayValue,`ip-api.com response field: ${key}`);
-      }).join('');
-      updateJsonPreview();
-    })
-    .catch(error=>{
-      const message=error.name==='AbortError'?'সময় শেষ হয়েছে; পরে আবার চেষ্টা করো।':(error.message||'সেবা থেকে তথ্য আনা যায়নি।');
-      ipLocationResult='পাওয়া যায়নি';
-      ipApiResult={status:'error',message};
-      document.getElementById('ipData').innerHTML=row('Lookup ব্যর্থ',message,'নেটওয়ার্ক, provider বা browser policy-এর কারণে ব্যর্থ হতে পারে।');
-      updateJsonPreview();
-    })
-    .finally(()=>{
-      window.clearTimeout(timeout);
-      button.disabled=false;
-      button.textContent='🔄 IP lookup আবার চেষ্টা করো';
-      updateJsonPreview();
-    });
+  const controller=new AbortController();const timeout=window.setTimeout(()=>controller.abort(),12000);
+  button.disabled=true;button.textContent='⏳ IP তথ্য আনা হচ্ছে...';ipLocationResult='আনা হচ্ছে...';ipApiResult={status:'loading'};
+  document.getElementById('ipData').innerHTML=row('অবস্থা','তথ্য আনা হচ্ছে...','তোমার সম্মতিতে HTTPS geolocation service-এ request পাঠানো হচ্ছে; এতে provider তোমার public IP পাবে.');updateJsonPreview();
+  const endpoints=[{url:'https://ipwho.is/',provider:'ipwho.is'},{url:'https://ipapi.co/json/',provider:'ipapi.co'}];
+  const fetchEndpoint=async(index)=>{
+    const endpoint=endpoints[index];
+    try{
+      const response=await fetch(endpoint.url,{signal:controller.signal,headers:{Accept:'application/json'}});
+      if(response.status===429){const retry=Number(response.headers.get('Retry-After'));if(retry>0)ipApiBlockedUntil=Date.now()+retry*1000;throw new Error('API rate limit হয়েছে; কিছুক্ষণ পরে আবার চেষ্টা করো.');}
+      if(!response.ok)throw new Error(`${endpoint.provider} থেকে HTTP ${response.status} উত্তর এসেছে।`);
+      const data=await response.json();
+      if(endpoint.provider==='ipwho.is'&&data.success===false)throw new Error(data.message||'IP lookup সফল হয়নি।');
+      if(endpoint.provider==='ipapi.co'&&data.error)throw new Error(data.reason||data.error||'IP lookup সফল হয়নি।');
+      return {data,provider:endpoint.provider};
+    }catch(error){if(error.name==='AbortError')throw error;if(index+1<endpoints.length)return fetchEndpoint(index+1);throw error;}
+  };
+  fetchEndpoint(0).then(({data,provider})=>{
+    const connection=data.connection||{};
+    const normalized={status:'success',provider,continent:data.continent||data.continent_name||'',continentCode:data.continent_code||'',country:data.country||data.country_name||'',countryCode:data.country_code||'',region:data.region||data.region_name||'',regionName:data.region||data.region_name||'',city:data.city||'',district:data.district||'',zip:data.postal||data.postal_code||'',lat:data.latitude??data.lat??null,lon:data.longitude??data.lon??null,timezone:data.timezone?.id||data.timezone||'',offset:data.timezone?.utc??data.utc_offset??'',currency:data.currency||'',isp:connection.isp||data.org||data.org_name||'',org:connection.org||data.org||data.org_name||'',as:connection.asn||data.asn||'',asname:connection.org||data.org||data.org_name||'',mobile:connection.mobile??false,proxy:connection.proxy??false,hosting:connection.hosting??false,query:data.ip||data.query||''};
+    ipApiResult=normalized;ipLocationResult=[normalized.city,normalized.regionName,normalized.country].filter(Boolean).join(', ')||'অঞ্চল পাওয়া যায়নি';
+    const labels={status:'Status',provider:'Provider',continent:'Continent',continentCode:'Continent code',country:'Country',countryCode:'Country code',region:'Region code',regionName:'Region',city:'City',district:'District',zip:'ZIP code',lat:'Latitude (IP estimate)',lon:'Longitude (IP estimate)',timezone:'Timezone',offset:'UTC offset',currency:'Currency',isp:'ISP',org:'Organization',as:'AS',asname:'AS name',mobile:'Mobile connection',proxy:'Proxy/VPN/Tor flag',hosting:'Hosting/data-center flag',query:'Queried IP'};
+    document.getElementById('ipData').innerHTML=Object.entries(normalized).map(([key,value])=>{const shown=typeof value==='boolean'?(value?'Yes':'No'):(value===''||value===null?'—':String(value));return row(labels[key]||key,shown,`${provider} response field: ${key}`);}).join('');updateJsonPreview();
+  }).catch(error=>{
+    const message=error.name==='AbortError'?'সময় শেষ হয়েছে; পরে আবার চেষ্টা করো।':(error.message||'HTTPS geolocation service থেকে তথ্য আনা যায়নি।');ipLocationResult='পাওয়া যায়নি';ipApiResult={status:'error',message};document.getElementById('ipData').innerHTML=row('Lookup ব্যর্থ',message,'HTTPS provider, network বা browser policy-এর কারণে request ব্যর্থ হতে পারে।');updateJsonPreview();
+  }).finally(()=>{window.clearTimeout(timeout);button.disabled=false;button.textContent='🔄 IP lookup আবার চেষ্টা করো';updateJsonPreview();});
 }
-
 let ipApiBlockedUntil=0;
 const SNAPSHOT_KEY='browserInfoSnapshots';
 
@@ -984,3 +948,5 @@ window.addEventListener('DOMContentLoaded',giveConsent(true));
 </script>
 </body>
 </html>
+
+
