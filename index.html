@@ -55,15 +55,21 @@ ul{margin:8px 0;padding-left:20px;color:var(--muted);line-height:1.7;}
 .datagrid{display:grid;grid-template-columns:1fr;gap:10px;}
 .row{
   display:flex;justify-content:space-between;gap:10px;padding:10px 12px;
-  background:var(--bg);border-radius:10px;font-size:.92rem;
+  background:var(--bg);border-radius:10px;font-size:.92rem;flex-wrap:wrap;
 }
 .row .k{color:var(--muted);}
 .row .v{font-weight:600;text-align:right;word-break:break-word;}
+.row .explanation{width:100%;font-size:.78rem;color:var(--muted);line-height:1.45;}
 .note{
   font-size:.85rem;color:var(--muted);background:var(--bg);border-left:3px solid var(--accent2);
   padding:10px 12px;border-radius:8px;margin-top:10px;
 }
 a.maplink{color:var(--accent);font-weight:600;}
+.table-wrap{overflow-x:auto;margin-top:10px;}
+table{width:100%;border-collapse:collapse;font-size:.85rem;}
+th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical-align:top;}
+th{color:var(--muted);}
+.file-input{display:block;width:100%;margin-top:12px;color:var(--muted);}
 .footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:30px;}
 </style>
 </head>
@@ -75,42 +81,39 @@ a.maplink{color:var(--accent);font-weight:600;}
     <h1>তোমার ব্রাউজার সম্পর্কে কী জানা যায়? 🔍</h1>
     <div class="sub">এই পেজটা দেখাবে তোমার browser ও device থেকে কী কী তথ্য স্বাভাবিকভাবে জানা যায় — একদম transparent ভাবে।</div>
 
-    <div class="card" style="background:#fff3b0;border-color:#f3cf3a;">
-      <strong style="color:#4a3b00;">আমরা কী সংগ্রহ করব</strong>
-      <ul style="color:#4a3b00;">
-        <li>Device / browser / OS তথ্য</li>
-        <li>স্ক্রিন সাইজ, ভাষা, টাইমজোন</li>
-        <li>নেটওয়ার্কের আনুমানিক ধরন/গতি, RAM, ব্যাটারি, touch ও theme preference</li>
-        <li>ব্রাউজার যতটুকু দেখায়, camera/microphone device-এর নাম (রেকর্ডিং নয়)</li>
-        <li>তোমার অনুমতি দিলে — আনুমানিক GPS লোকেশন</li>
-      </ul>
-      <strong>আমরা কী করব না</strong>
+    <div class="card">
+      <strong>শর্তাবলী ও গোপনীয়তা</strong>
+      <p style="color:var(--muted);font-size:.9rem;line-height:1.7;margin-top:8px;">এটি শিক্ষামূলক browser-তথ্য ডেমো। কোনো তথ্য এই ডেমোর server/database-এ জমা হয় না; ফলাফল পেজে দেখানো হয়। তুমি “সম্মত” বললে browser/device তথ্য দেখানো হবে এবং public IP ও আনুমানিক অঞ্চল পেতে ipwho.is-এ অনুরোধ যাবে।</p>
       <ul>
-        <li>এই তথ্য কোনো সার্ভারে পাঠানো হবে না</li>
-        <li>তোমার অনুমতি ছাড়া location নেওয়া হবে না</li>
-        <li>কেউ গোপনে এই data দেখতে পারবে না — শুধু তুমি নিজে দেখবে</li>
+        <li><strong>সাধারণ তথ্য:</strong> browser/OS-এর আনুমানিক পরিচয়, browser যে device model প্রকাশ করে, mobile/tablet/computer ধরন, screen ও viewport, ভাষা, timezone, স্থানীয় সময়, browser feature support, network-এর আনুমানিক ধরন/গতি, RAM/battery support, touch এবং online অবস্থা। browser কিছু তথ্য গোপন বা আনুমানিক করতে পারে; প্রকৃত device name/model অনেক সময় প্রকাশ করে না।</li>
+        <li><strong>Camera/microphone:</strong> সম্মতির পর browser যে device-এর ধরন/নাম প্রকাশ করে তা পড়া হতে পারে। camera/mic চালু, permission চাওয়া বা recording করা হয় না।</li>
+        <li><strong>GPS location:</strong> শুধু আলাদা location বোতাম চাপলে browser permission চাইবে; browser/device-এর location service-ও ব্যবহার হতে পারে। স্থানাঙ্ক ও accuracy পেজে দেখানো হবে; Google Maps link খুললে স্থানাঙ্ক Google-এ যাবে।</li>
+        <li><strong>IP address:</strong> “সম্মত” চাপলেই public IP address ও আনুমানিক দেশ/অঞ্চল আনার জন্য তোমার browser সরাসরি ipwho.is-এ request পাঠাবে। ফলে provider তোমার IP পাবে; IP-ভিত্তিক অঞ্চল GPS নয় এবং ভুল হতে পারে। অসম্মত হলে এই request পাঠানো হবে না।</li>
+        <li><strong>Browser তুলনা:</strong> snapshot সেভ করলে তা এই browser-এর local storage-এ থাকবে; JSON export/import করলে ফাইলটি তুমি নিজে স্থানান্তর করবে।</li>
+        <li><strong>JSON:</strong> পেজের নিচে বর্তমান ফলাফলের JSON দেখানো হবে। এটি server-এ পাঠানো বা স্বয়ংক্রিয়ভাবে download করা হবে না।</li>
+        <li><strong>অসম্মতি:</strong> অসম্মত হলেও অনুমতি বা বাইরের সেবা ছাড়া পাওয়া যায় এমন সাধারণ browser/device তথ্য দেখা যাবে। তখন location, IP lookup, media device list ও browser comparison চালু হবে না।</li>
       </ul>
-      <button class="btn btn-ghost" onclick="togglePolicy()">📄 Privacy Policy পুরোটা পড়ো</button>
+      <p style="color:var(--muted);font-size:.9rem;line-height:1.7;">“সম্মত” চাপলে IP lookup স্বয়ংক্রিয়ভাবে হবে—এটি সম্মতির অংশ। GPS-এর জন্য আলাদা location বোতাম ও browser permission লাগবে। যেকোনো সময় পেজ বন্ধ করে বের হতে পারো।</p>
     </div>
 
-    <div id="policyCard" class="card hidden">
-      <strong>Privacy Policy</strong>
-      <p style="color:var(--muted);font-size:.9rem;line-height:1.7;margin-top:8px;">
-      এই অ্যাপটি একটি স্কুল অ্যাসাইনমেন্টের অংশ, যার উদ্দেশ্য দেখানো যে একটি ওয়েবসাইট visitor-এর browser থেকে স্বাভাবিকভাবে কী তথ্য পায়। এখানে সংগৃহীত সব তথ্য শুধুমাত্র তোমার নিজের স্ক্রিনে দেখানো হবে — কোনো ডেটাবেজ, সার্ভার বা তৃতীয় পক্ষের কাছে পাঠানো হয় না। Camera ও microphone-এর ক্ষেত্রে শুধু browser যে নাম/সংখ্যা দেখায় তা পড়া হয়; permission চাওয়া বা recording করা হয় না। Location তথ্য শুধু তখনই সংগ্রহ করা হবে যখন তুমি ব্রাউজারের নিজস্ব permission popup-এ "Allow" চাপবে। যেকোনো সময় তুমি browser settings থেকে এই অনুমতি বাতিল করতে পারো। এটি সম্পূর্ণভাবে educational উদ্দেশ্যে তৈরি, কোনো ব্যক্তিকে গোপনে ট্র্যাক করার জন্য নয়।
-      </p>
-    </div>
-
-    <button class="btn btn-primary" onclick="giveConsent()">✅ আমি সম্মত, দেখাও</button>
+    <button class="btn btn-primary" onclick="giveConsent(true)">✅ শর্ত পড়েছি ও সম্মত — সব browser তথ্য দেখাও</button>
+    <button class="btn btn-outline" onclick="giveConsent(false)">অসম্মত — শুধু permission ছাড়া পাওয়া তথ্য দেখাও</button>
   </div>
 
   <div id="resultView" class="hidden">
     <span class="badge">তোমার তথ্য</span>
     <h1>এই তো তোমার browser যা জানালো 👀</h1>
-    <div class="sub">নিচের সব তথ্য শুধু তোমার স্ক্রিনেই দেখা যাচ্ছে।</div>
+    <div class="sub">ফলাফল এই পেজে দেখানো হয়। IP lookup বা Google Maps খুললে নির্বাচিত তথ্য সংশ্লিষ্ট provider-এর কাছে যেতে পারে।</div>
 
     <div class="card">
       <strong>Device ও Browser</strong>
       <div class="datagrid" id="deviceData" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
+      <strong>Browser feature support</strong>
+      <div class="datagrid" id="featureData" style="margin-top:10px;"></div>
+      <div class="note">“সমর্থিত” মানে browser-এ API আছে; কোনো feature চালু/অনুমোদিত আছে—এটা সবসময় বোঝায় না। JavaScript না চললে এই পেজই খুলবে না।</div>
     </div>
 
     <div class="card">
@@ -119,26 +122,65 @@ a.maplink{color:var(--accent);font-weight:600;}
       <div class="note">Network speed আনুমানিক। Browser/OS কিছু তথ্য সমর্থন না করলে বা গোপন রাখলে তা দেখা যাবে না।</div>
     </div>
 
-    <div class="card">
+    <div class="card advanced-only">
       <strong>Camera ও Microphone</strong>
       <div class="datagrid" id="mediaData" style="margin-top:10px;"></div>
       <div class="note">শুধু device-এর নাম/সংখ্যা দেখা হয়। কোনো permission popup চাওয়া হয় না এবং recording করা হয় না। Browser নাম লুকিয়ে রাখলে এখানে তা জানানো হবে।</div>
     </div>
 
-    <div class="card">
+    <div class="card advanced-only">
       <strong>নেটওয়ার্ক / IP</strong>
       <div class="datagrid" id="ipData" style="margin-top:10px;"></div>
-      <div class="note">Published web page-এর security নিয়মের কারণে client-side JavaScript দিয়ে সরাসরি IP address আনা যায় না (বাইরের API-তে call block থাকে) — এজন্য real IP দেখাতে একটা server-side অংশ লাগবে, যা এই ডেমোতে নেই।</div>
+      <div class="note">IP থেকে পাওয়া অঞ্চল আনুমানিক; VPN, mobile network বা provider-এর database-এর কারণে ভুল হতে পারে। lookup করলে তোমার IP ipwho.is-এর সঙ্গে শেয়ার হবে।</div>
+      <button id="ipLookupButton" class="btn btn-outline" onclick="lookupIP()">🔄 IP lookup আবার চেষ্টা করো</button>
+    </div>
+
+    <div class="card advanced-only">
+      <strong>লোকেশন</strong>
+      <div id="locPermission" class="datagrid" style="margin-top:10px;"></div>
+      <div id="locStatus" class="note">এখনো লোকেশন চাওয়া হয়নি।</div>
+      <div class="datagrid" id="locData" style="margin-top:10px;"></div>
+      <button class="btn btn-outline" onclick="askLocation()">📍 আমার লোকেশন জানতে চাও</button>
+      <div class="note">Accuracy হলো আনুমানিক ব্যাসার্ধ (মিটার); এটি সবসময় GPS থেকে আসে না—Wi-Fi, mobile network বা device setting-এর ওপর নির্ভর করতে পারে।</div>
     </div>
 
     <div class="card">
-      <strong>লোকেশন</strong>
-      <div id="locStatus" class="note">এখনো চাওয়া হয়নি।</div>
-      <div class="datagrid" id="locData" style="margin-top:10px;"></div>
-      <button class="btn btn-outline" onclick="askLocation()">📍 আমার লোকেশন জানতে চাও</button>
+      <strong>Research: পদ্ধতি অনুযায়ী পাওয়া location</strong>
+      <p class="note">প্রতিটি পদ্ধতিতে এই পেজ বাস্তবে location পেয়েছে কি না নিচে দেখানো হয়। Device location পেলে browser কোন source (GPS/Wi-Fi/cellular) ব্যবহার করেছে তা সাধারণত জানায় না—তাই সেই source-গুলোর আলাদা ফলাফল অনুমান করে দেখানো হবে না।</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>পদ্ধতি</th><th>এই পেজে পাওয়া location</th></tr></thead>
+          <tbody id="locationResearchRows"></tbody>
+        </table>
+      </div>
+      <p class="note">Browser Geolocation API location দিলে সেটি device location service থেকে পাওয়া স্থানাঙ্ক; browser GPS/Wi-Fi/cellular-এর মধ্যে কোনটি ব্যবহার করেছে তা প্রকাশ করে না। IP location কেবল আনুমানিক অঞ্চল।</p>
+      <p class="note">তথ্যসূত্র: <a href="https://www.w3.org/TR/geolocation/" target="_blank" rel="noopener noreferrer">W3C Geolocation API</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API" target="_blank" rel="noopener noreferrer">MDN Geolocation API</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API" target="_blank" rel="noopener noreferrer">MDN Web Bluetooth API</a></p>
+    </div>
+
+    <div class="card advanced-only">
+      <strong>Browser-ভেদে তুলনা</strong>
+      <p class="note">প্রতিটি browser-এ পেজটি খুলে snapshot সেভ করো। অন্য browser-এর snapshot JSON হিসেবে export করে এখানে import করলে তুলনার টেবিল তৈরি হবে।</p>
+      <button class="btn btn-outline" onclick="saveBrowserSnapshot()">💾 এই browser-এর তথ্য সেভ করো</button>
+      <button class="btn btn-outline" onclick="exportBrowserSnapshots()">⬇️ তুলনার তথ্য export করো</button>
+      <button class="btn btn-ghost" onclick="clearBrowserSnapshots()">🗑️ সেভ করা তুলনার তথ্য মুছো</button>
+      <label class="file-input">অন্য browser-এর JSON import করো
+        <input id="snapshotFile" type="file" accept="application/json,.json" onchange="importBrowserSnapshots(event)">
+      </label>
+      <div id="snapshotStatus" class="note" aria-live="polite"></div>
+      <div class="table-wrap" id="comparisonTable"></div>
+    </div>
+
+    <div id="limitedNotice" class="card hidden">
+      <strong>সীমিত তথ্য মোড</strong>
+      <p class="note">শর্তে সম্মতি দেওয়া হয়নি। তাই location, IP lookup, camera/microphone device list এবং browser-comparison storage ব্যবহার করা হয়নি.</p>
     </div>
 
     <button class="btn btn-ghost" onclick="resetAll()">🔄 শুরু থেকে আবার দেখাও</button>
+    <div class="card" id="jsonCard">
+      <strong>বর্তমান ফলাফলের JSON</strong>
+      <p class="note">এটি এই পেজের বর্তমান ফলাফলের JSON preview। এখানে দেখানো ছাড়া কোথাও পাঠানো হচ্ছে না।</p>
+      <pre id="jsonPreview" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:520px;overflow:auto;background:var(--bg);padding:12px;border-radius:10px;font-size:.8rem;"></pre>
+    </div>
   </div>
 
   <div class="footer">School assignment • AI দিয়ে তৈরি • Consent-based demo</div>
@@ -147,12 +189,110 @@ a.maplink{color:var(--accent);font-weight:600;}
 <script>
 function togglePolicy(){document.getElementById('policyCard').classList.toggle('hidden');}
 
-function row(k,v){return `<div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>`;}
+function row(k,v,explanation='ব্রাউজারের নিজস্ব API থেকে পাওয়া; browser তথ্যটি সীমিত বা গোপন করতে পারে।'){
+  return `<div class="row"><span class="k">${escapeHTML(k)}</span><span class="v">${escapeHTML(v)}</span><small class="explanation">${escapeHTML(explanation)}</small></div>`;
+}
 
-function giveConsent(){
+let consentMode='not-decided';
+let deviceLocationResult=null;
+let ipLocationResult=null;
+
+function giveConsent(agreed){
+  consentMode=agreed?'full':'limited';
   document.getElementById('consentView').classList.add('hidden');
   document.getElementById('resultView').classList.remove('hidden');
+  document.querySelectorAll('.advanced-only').forEach(card=>card.classList.toggle('hidden',!agreed));
+  document.getElementById('limitedNotice').classList.toggle('hidden',agreed);
   loadDeviceData();
+  renderFeatureData();
+  if(agreed){
+    updateLocationPermission();
+    renderComparisonTable();
+    lookupIP();
+  }
+  updateJsonPreview();
+}
+
+function getGridData(id){
+  return Array.from(document.querySelectorAll(`#${id} .row`)).map(item=>({
+    value:item.querySelector('.v') ? item.querySelector('.v').textContent.trim() : '',
+    explanation:item.querySelector('.explanation') ? item.querySelector('.explanation').textContent.trim() : '',
+  }));
+}
+
+function getComparisonData(){
+  const table=document.querySelector('#comparisonTable table');
+  if(!table)return [];
+  return Array.from(table.querySelectorAll('tbody tr')).map(tr=>{
+    const cells=Array.from(tr.querySelectorAll('th,td'));
+    return {
+      field:cells[0] ? cells[0].textContent.trim() : '',
+      browsers:cells.slice(1).map(cell=>cell.textContent.trim()),
+    };
+  });
+}
+
+function getLocationResearchResults(){
+  const browserLocation=deviceLocationResult && deviceLocationResult.status==='available'
+    ? `Latitude ${deviceLocationResult.latitude}, Longitude ${deviceLocationResult.longitude} (accuracy ±${Math.round(deviceLocationResult.accuracyMeters)} m)`
+    : 'পাওয়া যায়নি';
+  return [
+    {method:'Wi-Fi Positioning (WPS)',location:'পাওয়া যায়নি (আলাদা Wi-Fi scan/location data পাওয়া যায় না)'},
+    {method:'Cell tower estimation',location:'পাওয়া যায়নি (cell tower data পাওয়া যায় না)'},
+    {method:'IP geolocation',location:ipLocationResult || 'পাওয়া যায়নি'},
+    {method:'Browser Geolocation API',location:browserLocation},
+    {method:'Bluetooth beacon (BLE)',location:'পাওয়া যায়নি (beacon location data পাওয়া যায় না)'},
+  ];
+}
+
+function renderLocationResearch(){
+  const target=document.getElementById('locationResearchRows');
+  if(!target)return;
+  target.innerHTML=getLocationResearchResults().map(item=>
+    `<tr><th>${escapeHTML(item.method)}</th><td>${escapeHTML(item.location)}</td></tr>`
+  ).join('');
+}
+
+function updateJsonPreview(){
+  const preview=document.getElementById('jsonPreview');
+  if(!preview || document.getElementById('resultView').classList.contains('hidden'))return;
+  const fullConsent=consentMode==='full';
+  const data={
+    generatedAt:new Date().toISOString(),
+    consent:{
+      status:fullConsent?'agreed':'declined',
+      mode:fullConsent?'all browser information':'permission-free information only',
+    },
+    deviceAndBrowser:getGridData('deviceData'),
+    browserFeatureSupport:getGridData('featureData'),
+    networkAndDevice:getGridData('extraData'),
+    cameraAndMicrophone:fullConsent?getGridData('mediaData'):'not collected: terms declined',
+    ipLookup:fullConsent?getGridData('ipData'):'not collected: terms declined',
+    location:{
+      permissionStatus:fullConsent?getGridData('locPermission'):'not checked: terms declined',
+      requestStatus:fullConsent?document.getElementById('locStatus').textContent.trim():'not requested: terms declined',
+      coordinates:fullConsent?getGridData('locData'):'not collected: terms declined',
+      deviceLocation:fullConsent?deviceLocationResult:null,
+      sourceNote:'Browser Geolocation API location may use GPS, Wi-Fi, or cellular sources; the browser does not reliably identify which source was used or expose a GPS on/off switch.',
+    },
+    locationResearch:{
+      methods:getLocationResearchResults(),
+      sources:[
+        'https://www.w3.org/TR/geolocation/',
+        'https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API',
+        'https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API',
+      ],
+    },
+    browserComparison:fullConsent?getComparisonData():'not collected: terms declined',
+    privacy:{
+      storedOnServer:false,
+      ipLookupRequiresTermsConsent:true,
+      locationRequiresBrowserPermission:true,
+      mapLinkMayShareCoordinatesWithGoogle:true,
+    },
+  };
+  preview.textContent=JSON.stringify(data,null,2);
+  renderLocationResearch();
 }
 
 function resetAll(){
@@ -160,41 +300,95 @@ function resetAll(){
   document.getElementById('consentView').classList.remove('hidden');
   document.getElementById('locStatus').textContent='এখনো চাওয়া হয়নি।';
   document.getElementById('locData').innerHTML='';
+  document.getElementById('locPermission').innerHTML='';
+  document.getElementById('mediaData').innerHTML='';
+  document.getElementById('ipData').innerHTML='';
+  document.getElementById('comparisonTable').innerHTML='';
+  deviceLocationResult=null;
+  ipLocationResult=null;
+  consentMode='not-decided';
+  document.getElementById('jsonPreview').textContent='';
 }
 
 function loadDeviceData(){
   try{
     const ua = navigator.userAgent;
+    const uaData = navigator.userAgentData;
     let browser='অজানা';
-    if(ua.includes('Chrome')&&!ua.includes('Edg'))browser='Chrome';
+    if(uaData && uaData.brands && uaData.brands.length){
+      browser=(uaData.brands.find(item=>!item.brand.includes('Not'))||uaData.brands[0]).brand;
+    }else if(ua.includes('Chrome')&&!ua.includes('Edg'))browser='Chrome';
     else if(ua.includes('Firefox'))browser='Firefox';
     else if(ua.includes('Safari')&&!ua.includes('Chrome'))browser='Safari';
     else if(ua.includes('Edg'))browser='Edge';
 
     let os='অজানা';
-    if(ua.includes('Android'))os='Android';
+    const platform=(uaData && uaData.platform)||navigator.platform||'';
+    if(ua.includes('Android') || platform==='Android')os='Android';
     else if(ua.includes('iPhone')||ua.includes('iPad'))os='iOS';
-    else if(ua.includes('Windows'))os='Windows';
-    else if(ua.includes('Mac'))os='macOS';
-    else if(ua.includes('Linux'))os='Linux';
+    else if(ua.includes('Windows')||platform.includes('Win'))os='Windows';
+    else if(ua.includes('Mac')||platform.includes('Mac'))os='macOS';
+    else if(ua.includes('Linux')||platform.includes('Linux'))os='Linux';
+
+    let deviceType='অজানা';
+    if(uaData && typeof uaData.mobile==='boolean'){
+      if(uaData.mobile)deviceType='Mobile phone';
+      else if(os==='Android' || /iPad|Tablet/i.test(ua) || (platform.includes('Mac') && navigator.maxTouchPoints>1))deviceType='Tablet';
+      else deviceType='Computer';
+    }else if(/iPad|Tablet/i.test(ua) || (os==='Android' && !/Mobile/i.test(ua))){
+      deviceType='Tablet';
+    }else if(/Mobi|iPhone|Android/i.test(ua)){
+      deviceType='Mobile phone';
+    }else if(/Windows|Macintosh|Linux|X11/i.test(ua)){
+      deviceType='Computer';
+    }
+
+    const reportedModel=uaData && uaData.model ? uaData.model : '';
+    const deviceName=reportedModel || `${deviceType} (নির্দিষ্ট model browser প্রকাশ করেনি)`;
 
     const html = [
-      row('Browser', browser),
-      row('Operating System', os),
-      row('স্ক্রিন রেজোলিউশন', screen.width+' × '+screen.height),
-      row('ভাষা (Language)', navigator.language||'—'),
-      row('টাইমজোন', Intl.DateTimeFormat().resolvedOptions().timeZone||'—'),
-      row('স্থানীয় সময়', new Date().toLocaleString('bn-BD')),
-      row('CPU কোর (আনুমানিক)', navigator.hardwareConcurrency||'জানা যায়নি'),
+      row('Browser', browser, 'User-Agent বা User-Agent Client Hints থেকে পাওয়া; browser পরিচয় বদলে বা আড়াল করতে পারে।'),
+      row('Operating System', os, 'User-Agent বা User-Agent Client Hints থেকে অনুমান; OS version সবসময় প্রকাশিত হয় না।'),
+      row('Device category', deviceType, 'User-Agent থেকে অনুমান; mobile/tablet/computer বিভাজন সব device-এ নিখুঁত নয়।'),
+      row('Device name', deviceName, reportedModel ? 'Browser-এর প্রকাশিত model; manufacturer-এর দেওয়া নাম নাও হতে পারে।' : 'Browser প্রকৃত device name/model প্রকাশ করেনি; category শুধু অনুমান।'),
+      row('Device model', reportedModel || 'Browser প্রকাশ করেনি', 'Privacy-র কারণে অধিকাংশ browser প্রকৃত model গোপন রাখে।'),
+      row('স্ক্রিন রেজোলিউশন', screen.width+' × '+screen.height, 'screen API-এর CSS pixel মাপ; physical pixel নয়।'),
+      row('Viewport size', window.innerWidth+' × '+window.innerHeight, 'পেজের দৃশ্যমান browser area-এর CSS pixel মাপ; resize/scrollbar-এ বদলাতে পারে।'),
+      row('Pixel ratio', window.devicePixelRatio||'জানা যায়নি', 'এক CSS pixel-এর তুলনায় device pixel-এর আনুমানিক অনুপাত।'),
+      row('Color depth', screen.colorDepth+' bit', 'Screen API-তে প্রকাশিত রঙের bit-depth; display-এর প্রকৃত রঙ-মান নয়।'),
+      row('Screen orientation', screen.orientation && screen.orientation.type ? screen.orientation.type : 'তথ্য প্রকাশিত নয়', 'Browser-এর screen orientation API থেকে; কিছু browser-এ পাওয়া যায় না।'),
+      row('ভাষা (Language)', navigator.language||'—', 'Browser-এর পছন্দের প্রধান ভাষা।'),
+      row('পছন্দের ভাষার তালিকা', navigator.languages && navigator.languages.length ? navigator.languages.join(', ') : (navigator.language||'—'), 'Browser-এর ভাষা পছন্দের ক্রম; এটি সুনির্দিষ্ট অঞ্চল নির্দেশ করে না।'),
+      row('টাইমজোন', Intl.DateTimeFormat().resolvedOptions().timeZone||'—', 'Device-এর timezone setting।'),
+      row('স্থানীয় সময়', new Date().toLocaleString('bn-BD'), 'এই device-এর clock ও locale অনুযায়ী।'),
+      row('CPU কোর (আনুমানিক)', navigator.hardwareConcurrency||'জানা যায়নি', 'Browser যে logical core সংখ্যা প্রকাশ করে; প্রকৃত CPU ক্ষমতা নয়।'),
+      row('Cookies setting', navigator.cookieEnabled ? 'চালু' : 'বন্ধ', 'Browser cookies গ্রহণ করতে পারে কি না; এই ডেমো cookie তৈরি করে না।'),
+      row('Do Not Track', navigator.doNotTrack || window.doNotTrack || 'কোনো পছন্দ প্রকাশিত নয়', 'Browser-এর privacy preference hint; ওয়েবসাইটকে tracking বন্ধ করতে বাধ্য করে না।'),
     ].join('');
     document.getElementById('deviceData').innerHTML = html;
+    if(uaData && typeof uaData.getHighEntropyValues==='function'){
+      uaData.getHighEntropyValues(['model']).then(details=>{
+        const model=details.model||'Browser প্রকাশ করেনি';
+        const name=model||`${deviceType} (নির্দিষ্ট model browser প্রকাশ করেনি)`;
+        const modelRow=Array.from(document.querySelectorAll('#deviceData .row')).find(item=>item.querySelector('.k').textContent==='Device model');
+        const nameRow=Array.from(document.querySelectorAll('#deviceData .row')).find(item=>item.querySelector('.k').textContent==='Device name');
+        if(modelRow)modelRow.outerHTML=row('Device model',model,'Privacy-র কারণে browser প্রকৃত model গোপন রাখতে পারে।');
+        if(nameRow)nameRow.outerHTML=row('Device name',name,details.model?'Browser-এর প্রকাশিত model; manufacturer-এর দেওয়া নাম নাও হতে পারে।':'Browser প্রকৃত device name/model প্রকাশ করেনি; category শুধু অনুমান।');
+        updateJsonPreview();
+      }).catch(()=>{
+        const modelRow=Array.from(document.querySelectorAll('#deviceData .row')).find(item=>item.querySelector('.k').textContent==='Device model');
+        if(modelRow)modelRow.outerHTML=row('Device model','Browser তথ্য দেয়নি','Browser device model query-র উত্তর দেয়নি; প্রকৃত model জানা যায়নি।');
+        updateJsonPreview();
+      });
+    }
   }catch(e){
     document.getElementById('deviceData').innerHTML = row('ত্রুটি','ডেটা লোড করা যায়নি');
   }
 
-  document.getElementById('ipData').innerHTML = row('IP Address','এই পেজে পাওয়া যাচ্ছে না (নোট দেখো)');
+  document.getElementById('ipData').innerHTML = row('IP Address','সম্মতির পর lookup হবে','IP সরাসরি browser API থেকে পাওয়া যায় না; সম্মতি দিলে ipwho.is-এর কাছে request পাঠানো হয়।');
   loadExtraData();
-  loadMediaData();
+  if(consentMode==='full')loadMediaData();
+  updateJsonPreview();
 }
 
 function getConnection(){
@@ -226,8 +420,10 @@ function renderExtraData(){
     row('Battery', batteryStatus),
     row('Touch screen', touch ? 'আছে' : 'নেই'),
     row('Theme preference', darkMode ? 'Dark mode' : 'Light mode'),
-    row('Internet status', navigator.onLine ? 'Online' : 'Offline'),
+    row('Reduced motion preference', window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'কম animation পছন্দ' : 'কম animation পছন্দ নয়/প্রকাশিত নয়', 'Device accessibility preference; browser/OS সমর্থন না করলে নির্ভরযোগ্য নয়।'),
+    row('Internet status', navigator.onLine ? 'Online' : 'Offline', 'Browser-এর online/offline flag; নির্দিষ্ট ওয়েবসাইটে সংযোগ নিশ্চিত করে না।'),
   ].join('');
+  updateJsonPreview();
 }
 
 function loadExtraData(){
@@ -256,12 +452,214 @@ function setBatteryStatus(value){
   const rows = document.getElementById('extraData');
   const batteryRow = Array.from(rows.querySelectorAll('.row')).find(item=>item.querySelector('.k').textContent === 'Battery');
   if(batteryRow)batteryRow.outerHTML = row('Battery', value);
+  updateJsonPreview();
+}
+
+function renderFeatureData(){
+  const support = [
+    ['JavaScript', 'চালু', 'এই পেজ JavaScript দিয়েই চলছে।'],
+    ['Geolocation API', navigator.geolocation ? 'সমর্থিত' : 'সমর্থিত নয়', 'সমর্থন থাকলেও location-এর জন্য আলাদা browser permission লাগে।'],
+    ['Permission API', navigator.permissions ? 'সমর্থিত' : 'সমর্থিত নয়', 'এই API permission status জানাতে পারে; সব browser-এ একইভাবে কাজ নাও করতে পারে।'],
+    ['Dark-mode query', window.matchMedia ? 'সমর্থিত' : 'সমর্থিত নয়', 'বর্তমান পছন্দটি “Theme preference” সারিতে দেখা যাবে।'],
+    ['Network Information API', getConnection() ? 'সমর্থিত' : 'সমর্থিত নয়', 'Network type/speed browser প্রকাশ করলে তবেই দেখা যায়।'],
+    ['Battery API', typeof navigator.getBattery === 'function' ? 'সমর্থিত' : 'সমর্থিত নয়', 'Battery level API privacy বা browser policy-তে বন্ধ থাকতে পারে।'],
+    ['Camera/microphone list', navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices === 'function' ? 'সমর্থিত' : 'সমর্থিত নয়', 'নাম গোপন থাকতে পারে; এখানে camera/mic চালু বা record করা হয় না।'],
+    ['Device RAM', typeof navigator.deviceMemory === 'number' ? 'সমর্থিত' : 'সমর্থিত নয়', 'শুধু browser প্রকাশ করলে আনুমানিক RAM দেখা যায়।'],
+  ];
+  document.getElementById('featureData').innerHTML = support.map(item=>row(item[0],item[1],item[2])).join('');
+  updateJsonPreview();
+}
+
+function updateLocationPermission(){
+  const target = document.getElementById('locPermission');
+  if(!navigator.geolocation){
+    target.innerHTML = row('Location permission','Geolocation API সমর্থিত নয়','এই browser-এ পেজ থেকে location চাওয়া যাবে না।');
+    updateJsonPreview();
+    return;
+  }
+  if(!navigator.permissions || typeof navigator.permissions.query !== 'function'){
+    target.innerHTML = row('Location permission','অবস্থা জানা যাচ্ছে না','Browser permission status API দেয় না; location বোতাম চাপলে browser popup দেখা যেতে পারে।');
+    updateJsonPreview();
+    return;
+  }
+  navigator.permissions.query({name:'geolocation'}).then(permission=>{
+    const labels={granted:'অনুমোদিত',denied:'বাতিল',prompt:'এখনো অনুমতি চাওয়া হয়নি'};
+    target.innerHTML = row('Location permission',labels[permission.state]||permission.state,'Browser-এর permission status; পরিবর্তন হলে এই সারি আপডেট হবে।');
+    permission.addEventListener('change',updateLocationPermission);
+    updateJsonPreview();
+  }).catch(()=>{
+    target.innerHTML = row('Location permission','অবস্থা জানা যাচ্ছে না','Browser permission status দিতে পারেনি; location বোতাম চাপলে popup দেখা যেতে পারে।');
+    updateJsonPreview();
+  });
+}
+
+function lookupIP(){
+  if(consentMode!=='full')return;
+  const button=document.getElementById('ipLookupButton');
+  const controller=new AbortController();
+  const timeout=window.setTimeout(()=>controller.abort(),10000);
+  button.disabled=true;
+  button.textContent='⏳ IP তথ্য আনা হচ্ছে...';
+  ipLocationResult='আনা হচ্ছে...';
+  document.getElementById('ipData').innerHTML=row('অবস্থা','তথ্য আনা হচ্ছে...','তোমার সম্মতিতে ipwho.is-এ অনুরোধ পাঠানো হচ্ছে।');
+  updateJsonPreview();
+  fetch('https://ipwho.is/',{signal:controller.signal})
+    .then(response=>{
+      if(!response.ok)throw new Error('সেবা থেকে উত্তর পাওয়া যায়নি।');
+      return response.json();
+    })
+    .then(data=>{
+      if(data.success===false)throw new Error(data.message||'IP lookup ব্যর্থ হয়েছে।');
+      const location=[data.city,data.region,data.country].filter(Boolean).join(', ')||'অঞ্চল পাওয়া যায়নি';
+      ipLocationResult=location;
+      document.getElementById('ipData').innerHTML=[
+        row('IP Address',data.ip||'পাওয়া যায়নি','এই ঠিকানাটি IP lookup provider থেকে পাওয়া।'),
+        row('আনুমানিক দেশ/অঞ্চল',location,'IP database থেকে অনুমান; সুনির্দিষ্ট ঠিকানা বা GPS অবস্থান নয়।'),
+        row('Timezone',data.timezone && data.timezone.id ? data.timezone.id : 'পাওয়া যায়নি','IP-ভিত্তিক আনুমানিক timezone।'),
+      ].join('');
+      updateJsonPreview();
+    })
+    .catch(error=>{
+      const message=error.name==='AbortError'?'সময় শেষ হয়েছে; পরে আবার চেষ্টা করো।':(error.message||'সেবা থেকে তথ্য আনা যায়নি।');
+      ipLocationResult='পাওয়া যায়নি';
+      document.getElementById('ipData').innerHTML=row('Lookup ব্যর্থ',message,'নেটওয়ার্ক, provider বা browser policy-এর কারণে ব্যর্থ হতে পারে।');
+      updateJsonPreview();
+    })
+    .finally(()=>{
+      window.clearTimeout(timeout);
+      button.disabled=false;
+      button.textContent='🔄 IP lookup আবার চেষ্টা করো';
+      updateJsonPreview();
+    });
+}
+
+const SNAPSHOT_KEY='browserInfoSnapshots';
+
+function getBrowserName(){
+  const ua=navigator.userAgent;
+  if(ua.includes('Edg'))return 'Edge';
+  if(ua.includes('Firefox'))return 'Firefox';
+  if(ua.includes('Chrome'))return 'Chrome';
+  if(ua.includes('Safari'))return 'Safari';
+  return 'অজানা';
+}
+
+function readSnapshots(){
+  const saved=localStorage.getItem(SNAPSHOT_KEY);
+  if(!saved)return [];
+  const parsed=JSON.parse(saved);
+  if(!Array.isArray(parsed))throw new Error('সেভ করা snapshot-এর format ঠিক নেই।');
+  return parsed;
+}
+
+function currentSnapshot(){
+  return {
+    browser:getBrowserName(),
+    capturedAt:new Date().toLocaleString('bn-BD'),
+    screen:`${screen.width} × ${screen.height}`,
+    viewport:`${window.innerWidth} × ${window.innerHeight}`,
+    pixelRatio:window.devicePixelRatio||'—',
+    language:navigator.language||'—',
+    geolocation:!!navigator.geolocation,
+    networkInfo:!!getConnection(),
+    battery:typeof navigator.getBattery==='function',
+    deviceMemory:typeof navigator.deviceMemory==='number' ? `${navigator.deviceMemory} GB` : 'প্রকাশিত নয়',
+  };
+}
+
+function saveBrowserSnapshot(){
+  try{
+    const snapshots=readSnapshots();
+    const snapshot=currentSnapshot();
+    const existing=snapshots.findIndex(item=>item.browser===snapshot.browser);
+    if(existing>=0)snapshots[existing]=snapshot;
+    else snapshots.push(snapshot);
+    localStorage.setItem(SNAPSHOT_KEY,JSON.stringify(snapshots));
+    document.getElementById('snapshotStatus').textContent=`${snapshot.browser}-এর তথ্য এই browser-এ সেভ হয়েছে। অন্য browser-এ নিতে export করে import করো।`;
+    renderComparisonTable();
+  }catch(error){
+    document.getElementById('snapshotStatus').textContent=`সেভ করা যায়নি: ${error.message||'local storage ব্যবহার করা যাচ্ছে না।'}`;
+  }
+}
+
+function renderComparisonTable(){
+  const target=document.getElementById('comparisonTable');
+  if(!target)return;
+  try{
+    const snapshots=readSnapshots();
+    if(!snapshots.length){target.innerHTML='';updateJsonPreview();return;}
+    const fields=[
+      ['Browser','browser'],['সংগ্রহের সময়','capturedAt'],['Screen','screen'],['Viewport','viewport'],
+      ['Pixel ratio','pixelRatio'],['Language','language'],['Geolocation API','geolocation'],
+      ['Network API','networkInfo'],['Battery API','battery'],['Device RAM','deviceMemory'],
+    ];
+    target.innerHTML=`<table><thead><tr><th>তথ্য</th>${snapshots.map(item=>`<th>${escapeHTML(item.browser||'অজানা')}</th>`).join('')}</tr></thead><tbody>${fields.map(field=>`<tr><th>${escapeHTML(field[0])}</th>${snapshots.map(item=>`<td>${escapeHTML(item[field[1]]===true?'সমর্থিত':item[field[1]]===false?'সমর্থিত নয়':item[field[1]]||'—')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    updateJsonPreview();
+  }catch(error){
+    target.textContent=`তুলনার তথ্য পড়া যায়নি: ${error.message||'local storage ব্যবহার করা যাচ্ছে না।'}`;
+    updateJsonPreview();
+  }
+}
+
+function exportBrowserSnapshots(){
+  try{
+    const snapshots=readSnapshots();
+    if(!snapshots.length){
+      document.getElementById('snapshotStatus').textContent='Export করার আগে অন্তত একটি browser snapshot সেভ করো।';
+      return;
+    }
+    const blob=new Blob([JSON.stringify(snapshots,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;
+    link.download='browser-comparison.json';
+    link.click();
+    URL.revokeObjectURL(url);
+    document.getElementById('snapshotStatus').textContent='JSON ফাইল download হয়েছে। অন্য browser-এ এই ফাইল import করো।';
+  }catch(error){
+    document.getElementById('snapshotStatus').textContent=`Export করা যায়নি: ${error.message||'তথ্য পড়া যাচ্ছে না।'}`;
+  }
+}
+
+function clearBrowserSnapshots(){
+  if(!window.confirm('এই browser-এ সেভ করা সব comparison snapshot মুছে ফেলবে। এগোবে?'))return;
+  try{
+    localStorage.removeItem(SNAPSHOT_KEY);
+    document.getElementById('snapshotStatus').textContent='এই browser-এর সেভ করা তুলনার তথ্য মুছে ফেলা হয়েছে।';
+    renderComparisonTable();
+  }catch(error){
+    document.getElementById('snapshotStatus').textContent=`তথ্য মুছতে পারিনি: ${error.message||'local storage ব্যবহার করা যাচ্ছে না।'}`;
+  }
+}
+
+function importBrowserSnapshots(event){
+  const file=event.target.files && event.target.files[0];
+  if(!file)return;
+  file.text().then(text=>{
+    const imported=JSON.parse(text);
+    if(!Array.isArray(imported)||imported.some(item=>!item||typeof item.browser!=='string')){
+      throw new Error('ফাইলটি browser comparison-এর সঠিক JSON নয়।');
+    }
+    const merged=readSnapshots();
+    imported.forEach(snapshot=>{
+      const index=merged.findIndex(item=>item.browser===snapshot.browser);
+      if(index>=0)merged[index]=snapshot;
+      else merged.push(snapshot);
+    });
+    localStorage.setItem(SNAPSHOT_KEY,JSON.stringify(merged));
+    document.getElementById('snapshotStatus').textContent=`${imported.length}টি browser snapshot import হয়েছে।`;
+    renderComparisonTable();
+  }).catch(error=>{
+    document.getElementById('snapshotStatus').textContent=`Import করা যায়নি: ${error.message||'ফাইলটি পড়া যাচ্ছে না।'}`;
+  }).finally(()=>{event.target.value='';});
 }
 
 function loadMediaData(){
+  if(consentMode!=='full')return;
   const mediaData = document.getElementById('mediaData');
   if(!navigator.mediaDevices || typeof navigator.mediaDevices.enumerateDevices !== 'function'){
     mediaData.innerHTML = row('Device list','এই browser তথ্য দেয় না');
+    updateJsonPreview();
     return;
   }
 
@@ -275,8 +673,10 @@ function loadMediaData(){
       row(`Camera (${cameras.length})`, listNames(cameras)),
       row(`Microphone (${microphones.length})`, listNames(microphones)),
     ].join('');
+    updateJsonPreview();
   }).catch(()=>{
     mediaData.innerHTML = row('Device list','তথ্য পড়া যায়নি');
+    updateJsonPreview();
   });
 }
 
@@ -286,37 +686,71 @@ function escapeHTML(value){
   }[char]));
 }
 
-window.addEventListener('online',renderExtraData);
-window.addEventListener('offline',renderExtraData);
-if(getConnection() && typeof getConnection().addEventListener === 'function')getConnection().addEventListener('change',renderExtraData);
+window.addEventListener('online',()=>{if(consentMode!=='not-decided')renderExtraData();});
+window.addEventListener('offline',()=>{if(consentMode!=='not-decided')renderExtraData();});
+window.addEventListener('resize',()=>{
+  if(consentMode==='not-decided')return;
+  const viewportRow=Array.from(document.querySelectorAll('#deviceData .row')).find(item=>item.querySelector('.k').textContent==='Viewport size');
+  if(viewportRow)viewportRow.outerHTML=row('Viewport size',window.innerWidth+' × '+window.innerHeight,'পেজের দৃশ্যমান browser area-এর CSS pixel মাপ; resize/scrollbar-এ বদলাতে পারে।');
+  updateJsonPreview();
+});
+if(getConnection() && typeof getConnection().addEventListener === 'function'){
+  getConnection().addEventListener('change',()=>{if(consentMode!=='not-decided')renderExtraData();});
+}
 if(navigator.mediaDevices && typeof navigator.mediaDevices.addEventListener === 'function'){
-  navigator.mediaDevices.addEventListener('devicechange',loadMediaData);
+  navigator.mediaDevices.addEventListener('devicechange',()=>{
+    if(consentMode==='full')loadMediaData();
+  });
 }
 if(window.matchMedia){
   const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
-  if(typeof colorScheme.addEventListener === 'function')colorScheme.addEventListener('change',renderExtraData);
+  if(typeof colorScheme.addEventListener === 'function')colorScheme.addEventListener('change',()=>{if(consentMode!=='not-decided')renderExtraData();});
 }
 
 function askLocation(){
+  if(consentMode!=='full')return;
   const statusEl = document.getElementById('locStatus');
+  deviceLocationResult=null;
   if(!navigator.geolocation){
     statusEl.textContent='তোমার ব্রাউজার লোকেশন সাপোর্ট করে না।';
+    deviceLocationResult={status:'unsupported',message:statusEl.textContent};
+    updateJsonPreview();
     return;
   }
   statusEl.textContent='⏳ অনুমতি চাওয়া হচ্ছে... browser popup দেখো।';
+  updateJsonPreview();
   navigator.geolocation.getCurrentPosition(
     pos=>{
       const {latitude,longitude,accuracy} = pos.coords;
-      statusEl.textContent='✅ লোকেশন পাওয়া গেছে (তোমার অনুমতিতে)।';
+      deviceLocationResult={
+        status:'available',
+        latitude,
+        longitude,
+        accuracyMeters:accuracy,
+        capturedAt:new Date(pos.timestamp).toISOString(),
+        method:'Browser Geolocation API',
+        source:'Browser/device location service; exact source (GPS, Wi-Fi, or cellular) is not exposed',
+      };
+      statusEl.textContent='✅ লোকেশন পাওয়া গেছে (তোমার অনুমতিতে)। Accuracy হলো আনুমানিক ব্যাসার্ধ; এটি GPS, Wi-Fi বা network থেকে আসতে পারে।';
       document.getElementById('locData').innerHTML = [
-        row('Latitude', latitude.toFixed(5)),
-        row('Longitude', longitude.toFixed(5)),
-        row('নির্ভুলতা (Accuracy)', Math.round(accuracy)+' মিটার'),
-        row('মানচিত্রে দেখো', `<a class="maplink" target="_blank" href="https://www.google.com/maps?q=${latitude},${longitude}">Google Maps</a>`),
+        row('Latitude', latitude.toFixed(5),'Browser-এর location service থেকে পাওয়া; নির্ভুল স্থানাঙ্কের নিশ্চয়তা নয়।'),
+        row('Longitude', longitude.toFixed(5),'Browser-এর location service থেকে পাওয়া; নির্ভুল স্থানাঙ্কের নিশ্চয়তা নয়।'),
+        row('নির্ভুলতা (Accuracy)', 'প্রায় ±'+Math.round(accuracy)+' মিটার','Browser-প্রদত্ত আনুমানিক accuracy radius; উৎস ও পরিবেশে বদলায়।'),
+        `<div class="row"><span class="k">মানচিত্রে দেখো</span><span class="v"><a class="maplink" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps?q=${latitude},${longitude}">Google Maps</a></span><small class="explanation">লিংক খুললে স্থানাঙ্ক Google Maps-এ পাঠানো হবে।</small></div>`,
       ].join('');
+      updateLocationPermission();
+      updateJsonPreview();
     },
     err=>{
       statusEl.textContent='❌ লোকেশন পাওয়া যায়নি: '+(err.message||'অনুমতি দেওয়া হয়নি।');
+      deviceLocationResult={
+        status:'unavailable',
+        errorCode:err.code,
+        message:err.message||'লোকেশন পাওয়া যায়নি।',
+        note:'GPS/device location on আছে কি না browser নির্ভরযোগ্যভাবে জানায় না।',
+      };
+      updateLocationPermission();
+      updateJsonPreview();
     },
     {enableHighAccuracy:true,timeout:10000}
   );
