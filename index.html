@@ -52,6 +52,14 @@ ul{margin:8px 0;padding-left:20px;color:var(--muted);line-height:1.7;}
 .btn-outline{background:transparent;color:var(--accent);border:1.5px solid var(--accent);}
 .btn-ghost{background:transparent;color:var(--muted);text-decoration:underline;padding:8px;}
 .hidden{display:none;}
+.tic-board{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:360px;margin:18px auto;}
+.tic-cell{aspect-ratio:1;border:1px solid var(--border);border-radius:16px;background:var(--bg);color:var(--accent);font-size:clamp(2.5rem,12vw,4rem);font-weight:800;cursor:pointer;transition:transform .12s,background .12s;}
+.tic-cell:not(:disabled):hover{background:var(--surface);transform:translateY(-2px);}
+.tic-cell:disabled{cursor:default;}
+.tic-cell.mark-o{color:var(--accent2);}
+.tic-cell.winner{background:color-mix(in srgb,var(--accent2) 22%,var(--bg));border-color:var(--accent2);}
+.consent-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.consent-actions .btn{margin-top:0;}
 .datagrid{display:grid;grid-template-columns:1fr;gap:10px;}
 .row{
   display:flex;justify-content:space-between;gap:10px;padding:10px 12px;
@@ -77,27 +85,34 @@ th{color:var(--muted);}
 <div class="wrap">
 
   <div id="consentView">
-    <span class="badge">স্কুল অ্যাসাইনমেন্ট ডেমো</span>
-    <h1>তোমার ব্রাউজার সম্পর্কে কী জানা যায়? 🔍</h1>
-    <div class="sub">এই পেজটা দেখাবে তোমার browser ও device থেকে কী কী তথ্য স্বাভাবিকভাবে জানা যায় — একদম transparent ভাবে।</div>
-
+    <span class="badge">মিনি গেম</span>
+    <h1>Tic-Tac-Toe ⭕❌</h1>
+    <div class="sub">তুমি X, কম্পিউটার O। আগে পরপর তিনটি ঘর মেলাও!</div>
     <div class="card">
-      <strong>শর্তাবলী ও গোপনীয়তা</strong>
-      <p style="color:var(--muted);font-size:.9rem;line-height:1.7;margin-top:8px;">এটি শিক্ষামূলক browser-তথ্য ডেমো। কোনো তথ্য এই ডেমোর server/database-এ জমা হয় না; ফলাফল পেজে দেখানো হয়। তুমি “সম্মত” বললে browser/device তথ্য দেখানো হবে এবং public IP ও আনুমানিক অঞ্চল পেতে ipwho.is-এ অনুরোধ যাবে।</p>
-      <ul>
-        <li><strong>সাধারণ তথ্য:</strong> browser/OS-এর আনুমানিক পরিচয়, browser যে device model প্রকাশ করে, mobile/tablet/computer ধরন, screen ও viewport, ভাষা, timezone, স্থানীয় সময়, browser feature support, network-এর আনুমানিক ধরন/গতি, RAM/battery support, touch এবং online অবস্থা। browser কিছু তথ্য গোপন বা আনুমানিক করতে পারে; প্রকৃত device name/model অনেক সময় প্রকাশ করে না।</li>
-        <li><strong>Camera/microphone:</strong> সম্মতির পর browser যে device-এর ধরন/নাম প্রকাশ করে তা পড়া হতে পারে। camera/mic চালু, permission চাওয়া বা recording করা হয় না।</li>
-        <li><strong>GPS location:</strong> শুধু আলাদা location বোতাম চাপলে browser permission চাইবে; browser/device-এর location service-ও ব্যবহার হতে পারে। স্থানাঙ্ক ও accuracy পেজে দেখানো হবে; Google Maps link খুললে স্থানাঙ্ক Google-এ যাবে।</li>
-        <li><strong>IP address:</strong> “সম্মত” চাপলেই public IP address ও আনুমানিক দেশ/অঞ্চল আনার জন্য তোমার browser সরাসরি ipwho.is-এ request পাঠাবে। ফলে provider তোমার IP পাবে; IP-ভিত্তিক অঞ্চল GPS নয় এবং ভুল হতে পারে। অসম্মত হলে এই request পাঠানো হবে না।</li>
-        <li><strong>Browser তুলনা:</strong> snapshot সেভ করলে তা এই browser-এর local storage-এ থাকবে; JSON export/import করলে ফাইলটি তুমি নিজে স্থানান্তর করবে।</li>
-        <li><strong>JSON:</strong> পেজের নিচে বর্তমান ফলাফলের JSON দেখানো হবে। এটি server-এ পাঠানো বা স্বয়ংক্রিয়ভাবে download করা হবে না।</li>
-        <li><strong>অসম্মতি:</strong> অসম্মত হলেও অনুমতি বা বাইরের সেবা ছাড়া পাওয়া যায় এমন সাধারণ browser/device তথ্য দেখা যাবে। তখন location, IP lookup, media device list ও browser comparison চালু হবে না।</li>
-      </ul>
-      <p style="color:var(--muted);font-size:.9rem;line-height:1.7;">“সম্মত” চাপলে IP lookup স্বয়ংক্রিয়ভাবে হবে—এটি সম্মতির অংশ। GPS-এর জন্য আলাদা location বোতাম ও browser permission লাগবে। যেকোনো সময় পেজ বন্ধ করে বের হতে পারো।</p>
+      <div id="ticTacToeBoard" class="tic-board" role="grid" aria-label="Tic-Tac-Toe board">
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 1" onclick="makeTicTacToeMove(0)"></button>
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 2" onclick="makeTicTacToeMove(1)"></button>
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 3" onclick="makeTicTacToeMove(2)"></button>
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 4" onclick="makeTicTacToeMove(3)"></button>
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 5" onclick="makeTicTacToeMove(4)"></button>
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 6" onclick="makeTicTacToeMove(5)"></button>
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 7" onclick="makeTicTacToeMove(6)"></button>
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 8" onclick="makeTicTacToeMove(7)"></button>
+        <button class="tic-cell" type="button" role="gridcell" aria-label="ঘর 9" onclick="makeTicTacToeMove(8)"></button>
+      </div>
+      <div id="ticTacToeStatus" class="note" role="status" aria-live="polite">তোমার চাল — X</div>
+      <button class="btn btn-outline" type="button" onclick="resetTicTacToe()">আবার খেলো</button>
     </div>
 
-    <button class="btn btn-primary" onclick="giveConsent(true)">✅ শর্ত পড়েছি ও সম্মত — সব browser তথ্য দেখাও</button>
-    <button class="btn btn-outline" onclick="giveConsent(false)">অসম্মত — শুধু permission ছাড়া পাওয়া তথ্য দেখাও</button>
+    <div class="card" id="consentChoiceCard">
+      <strong>তথ্য শেয়ার করার পছন্দ</strong>
+      <p class="note">Agree দিলে browser/device তথ্য সংগ্রহ হবে, IP lookup হবে এবং JSON ও IP Supabase-এ save হবে। GPS-এর জন্য আলাদা permission লাগবে। Disagree করলে এই collection ও save হবে না; শুধু সীমিত browser তথ্য দেখাবে।</p>
+      <div class="consent-actions">
+        <button id="agreeConsentButton" class="btn btn-primary" type="button" onclick="giveConsent(true)">Agree</button>
+        <button id="disagreeConsentButton" class="btn btn-outline" type="button" onclick="giveConsent(false)">Disagree</button>
+      </div>
+      <div id="consentSaveStatus" class="note hidden" role="status" aria-live="polite"></div>
+    </div>
   </div>
 
   <div id="resultView" class="hidden">
@@ -131,7 +146,7 @@ th{color:var(--muted);}
     <div class="card advanced-only">
       <strong>নেটওয়ার্ক / IP</strong>
       <div class="datagrid" id="ipData" style="margin-top:10px;"></div>
-      <div class="note">IP থেকে পাওয়া অঞ্চল আনুমানিক; VPN, mobile network বা provider-এর database-এর কারণে ভুল হতে পারে। lookup করলে তোমার IP ipwho.is-এর সঙ্গে শেয়ার হবে।</div>
+      <div class="note">IP-ভিত্তিক location আনুমানিক; VPN/mobile carrier/database-এর কারণে ভুল হতে পারে। ip-api.com-এর free endpoint শুধু HTTP সমর্থন করে—HTTPS-hosted page থেকে browser mixed-content policy-তে request block করতে পারে। সে ক্ষেত্রে HTTPS API বা server-side proxy দরকার। HTTP encrypted নয়।</div>
       <button id="ipLookupButton" class="btn btn-outline" onclick="lookupIP()">🔄 IP lookup আবার চেষ্টা করো</button>
     </div>
 
@@ -154,7 +169,7 @@ th{color:var(--muted);}
         </table>
       </div>
       <p class="note">Browser Geolocation API location দিলে সেটি device location service থেকে পাওয়া স্থানাঙ্ক; browser GPS/Wi-Fi/cellular-এর মধ্যে কোনটি ব্যবহার করেছে তা প্রকাশ করে না। IP location কেবল আনুমানিক অঞ্চল।</p>
-      <p class="note">তথ্যসূত্র: <a href="https://www.w3.org/TR/geolocation/" target="_blank" rel="noopener noreferrer">W3C Geolocation API</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API" target="_blank" rel="noopener noreferrer">MDN Geolocation API</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API" target="_blank" rel="noopener noreferrer">MDN Web Bluetooth API</a></p>
+      <p class="note">তথ্যসূত্র: <a href="https://ip-api.com/docs/api:json" target="_blank" rel="noopener noreferrer">ip-api.com JSON API</a> · <a href="https://www.w3.org/TR/geolocation/" target="_blank" rel="noopener noreferrer">W3C Geolocation API</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API" target="_blank" rel="noopener noreferrer">MDN Geolocation API</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API" target="_blank" rel="noopener noreferrer">MDN Web Bluetooth API</a></p>
     </div>
 
     <div class="card advanced-only">
@@ -178,14 +193,16 @@ th{color:var(--muted);}
     <button class="btn btn-ghost" onclick="resetAll()">🔄 শুরু থেকে আবার দেখাও</button>
     <div class="card" id="jsonCard">
       <strong>বর্তমান ফলাফলের JSON</strong>
-      <p class="note">এটি এই পেজের বর্তমান ফলাফলের JSON preview। এখানে দেখানো ছাড়া কোথাও পাঠানো হচ্ছে না।</p>
+      <p class="note">সম্মতি দিলে এই JSON Supabase-এ নতুন record হিসেবে auto-save হবে।</p>
+      <div id="supabaseSaveStatus" class="note" role="status" aria-live="polite">Save-এর অপেক্ষায়।</div>
       <pre id="jsonPreview" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:520px;overflow:auto;background:var(--bg);padding:12px;border-radius:10px;font-size:.8rem;"></pre>
     </div>
   </div>
 
-  <div class="footer">School assignment • AI দিয়ে তৈরি • Consent-based demo</div>
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 function togglePolicy(){document.getElementById('policyCard').classList.toggle('hidden');}
 
@@ -196,16 +213,178 @@ function row(k,v,explanation='ব্রাউজারের নিজস্ব 
 let consentMode='not-decided';
 let deviceLocationResult=null;
 let ipLocationResult=null;
+let ipApiResult=null;
+const SUPABASE_URL='https://emzptttjwmvvzfqsjvmj.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_Uyx7unZoVFmWP7JiACQXZQ_Q5K8Iv15';
+const supabaseClient=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
+  auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},
+});
+let autoSaveDone=false;
+let autoSaveTimer=null;
+let autoSaveQueue=Promise.resolve();
+let mediaDataReady=false;
+let autoSaveStartedAt=0;
+let ticTacToeBoard=Array(9).fill('');
+let ticTacToeBusy=false;
+let ticTacToeFinished=false;
+let ticTacToeComputerTimer=null;
+const ticTacToeWins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function renderTicTacToe(winningLine=[]){
+  document.querySelectorAll('#ticTacToeBoard .tic-cell').forEach((cell,index)=>{
+    const mark=ticTacToeBoard[index];
+    cell.textContent=mark;
+    cell.disabled=Boolean(mark)||ticTacToeBusy||ticTacToeFinished;
+    cell.classList.toggle('mark-o',mark==='O');
+    cell.classList.toggle('winner',winningLine.includes(index));
+    cell.setAttribute('aria-label',`ঘর ${index+1}${mark?`: ${mark}`:''}`);
+  });
+}
+
+function findTicTacToeWinner(board){
+  for(const line of ticTacToeWins){
+    const [a,b,c]=line;
+    if(board[a]&&board[a]===board[b]&&board[a]===board[c])return {mark:board[a],line};
+  }
+  return null;
+}
+
+function makeTicTacToeMove(index){
+  if(ticTacToeBusy||ticTacToeFinished||ticTacToeBoard[index])return;
+  ticTacToeBoard[index]='X';
+  const result=findTicTacToeWinner(ticTacToeBoard);
+  if(result){
+    ticTacToeFinished=true;
+    renderTicTacToe(result.line);
+    document.getElementById('ticTacToeStatus').textContent='তুমি জিতেছ! 🎉';
+    return;
+  }
+  if(ticTacToeBoard.every(Boolean)){
+    ticTacToeFinished=true;
+    renderTicTacToe();
+    document.getElementById('ticTacToeStatus').textContent='ড্র! আবার খেলো।';
+    return;
+  }
+  ticTacToeBusy=true;
+  renderTicTacToe();
+  document.getElementById('ticTacToeStatus').textContent='কম্পিউটার চাল দিচ্ছে…';
+  ticTacToeComputerTimer=window.setTimeout(()=>{
+    ticTacToeComputerTimer=null;
+    const move=chooseComputerMove();
+    if(move!==-1)ticTacToeBoard[move]='O';
+    ticTacToeBusy=false;
+    const computerResult=findTicTacToeWinner(ticTacToeBoard);
+    if(computerResult){
+      ticTacToeFinished=true;
+      renderTicTacToe(computerResult.line);
+      document.getElementById('ticTacToeStatus').textContent='কম্পিউটার জিতেছে। আবার চেষ্টা করো!';
+      return;
+    }
+    if(ticTacToeBoard.every(Boolean)){
+      ticTacToeFinished=true;
+      renderTicTacToe();
+      document.getElementById('ticTacToeStatus').textContent='ড্র! আবার খেলো।';
+      return;
+    }
+    renderTicTacToe();
+    document.getElementById('ticTacToeStatus').textContent='তোমার চাল — X';
+  },250);
+}
+
+function chooseComputerMove(){
+  let bestScore=-Infinity;
+  let bestMove=-1;
+  ticTacToeBoard.forEach((cell,index)=>{
+    if(cell)return;
+    ticTacToeBoard[index]='O';
+    const score=minimaxTicTacToe(ticTacToeBoard,0,false);
+    ticTacToeBoard[index]='';
+    if(score>bestScore){bestScore=score;bestMove=index;}
+  });
+  return bestMove;
+}
+
+function minimaxTicTacToe(board,depth,isComputerTurn){
+  const winner=findTicTacToeWinner(board);
+  if(winner?.mark==='O')return 10-depth;
+  if(winner?.mark==='X')return depth-10;
+  if(board.every(Boolean))return 0;
+  let bestScore=isComputerTurn?-Infinity:Infinity;
+  board.forEach((cell,index)=>{
+    if(cell)return;
+    board[index]=isComputerTurn?'O':'X';
+    const score=minimaxTicTacToe(board,depth+1,!isComputerTurn);
+    board[index]='';
+    bestScore=isComputerTurn?Math.max(bestScore,score):Math.min(bestScore,score);
+  });
+  return bestScore;
+}
+
+function resetTicTacToe(){
+  clearTimeout(ticTacToeComputerTimer);
+  ticTacToeComputerTimer=null;
+  ticTacToeBoard=Array(9).fill('');
+  ticTacToeBusy=false;
+  ticTacToeFinished=false;
+  renderTicTacToe();
+  document.getElementById('ticTacToeStatus').textContent='তোমার চাল — X';
+}
+
+function scheduleSupabaseAutoSave(payload){
+  if(consentMode!=='full'||autoSaveDone)return;
+  const saveStatus=document.getElementById('consentSaveStatus');
+  if(!supabaseClient){
+    saveStatus.textContent='Auto-save ব্যর্থ: Supabase client load হয়নি; Internet/CDN connection পরীক্ষা করো।';
+    return;
+  }
+  saveStatus.textContent='JSON update হচ্ছে; auto-save হবে...';
+  const snapshot=JSON.parse(JSON.stringify(payload));
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer=setTimeout(()=>{
+    const initialDataPending=ipApiResult?.status==='loading'||!mediaDataReady||batteryStatus==='তথ্য লোড হচ্ছে...';
+    if(initialDataPending&&Date.now()-autoSaveStartedAt<20000){
+      scheduleSupabaseAutoSave(payload);
+      return;
+    }
+    autoSaveQueue=autoSaveQueue.then(async()=>{
+      if(consentMode!=='full'||autoSaveDone)return;
+      saveStatus.textContent='Supabase-এ JSON save হচ্ছে...';
+      const label=`Browser report ${new Date().toLocaleString()}`;
+      const result=await supabaseClient.from('saved_json').insert({
+        label,
+        payload:snapshot,
+        ip_address:snapshot.ipAddress||null,
+      });
+      if(result.error){
+        saveStatus.textContent=`Auto-save ব্যর্থ: ${result.error.message}`;
+        return;
+      }
+      autoSaveDone=true;
+      saveStatus.textContent=`Supabase connection ঠিক আছে—নতুন JSON row save হয়েছে (${new Date().toLocaleTimeString()}); এই visit-এ আরেকটি row তৈরি হবে না।`;
+    }).catch(error=>{saveStatus.textContent=`Auto-save ব্যর্থ: ${error.message||'অজানা সমস্যা'}`;});
+  },1800);
+}
 
 function giveConsent(agreed){
   consentMode=agreed?'full':'limited';
-  document.getElementById('consentView').classList.add('hidden');
-  document.getElementById('resultView').classList.remove('hidden');
+  if(agreed){
+    document.getElementById('consentChoiceCard').classList.add('hidden');
+    const saveStatus=document.getElementById('consentSaveStatus');
+    saveStatus.textContent='সম্মতি রেকর্ড হয়েছে। তথ্য তৈরি হচ্ছে; তারপর Supabase-এ save হবে...';
+    saveStatus.classList.remove('hidden');
+    document.getElementById('resultView').classList.add('hidden');
+  }else{
+    document.getElementById('consentView').classList.add('hidden');
+    document.getElementById('resultView').classList.remove('hidden');
+  }
   document.querySelectorAll('.advanced-only').forEach(card=>card.classList.toggle('hidden',!agreed));
   document.getElementById('limitedNotice').classList.toggle('hidden',agreed);
   loadDeviceData();
   renderFeatureData();
   if(agreed){
+    autoSaveDone=false;
+    mediaDataReady=false;
+    autoSaveStartedAt=Date.now();
     updateLocationPermission();
     renderComparisonTable();
     lookupIP();
@@ -255,19 +434,21 @@ function renderLocationResearch(){
 
 function updateJsonPreview(){
   const preview=document.getElementById('jsonPreview');
-  if(!preview || document.getElementById('resultView').classList.contains('hidden'))return;
+  if(!preview)return;
   const fullConsent=consentMode==='full';
   const data={
     generatedAt:new Date().toISOString(),
     consent:{
       status:fullConsent?'agreed':'declined',
-      mode:fullConsent?'all browser information':'permission-free information only',
+      mode:fullConsent?'browser/device information with Supabase auto-save':'permission-free information only',
     },
     deviceAndBrowser:getGridData('deviceData'),
     browserFeatureSupport:getGridData('featureData'),
     networkAndDevice:getGridData('extraData'),
     cameraAndMicrophone:fullConsent?getGridData('mediaData'):'not collected: terms declined',
     ipLookup:fullConsent?getGridData('ipData'):'not collected: terms declined',
+    ipAddress:fullConsent?(ipApiResult?.query||null):null,
+    ipApiResponse:fullConsent?ipApiResult:null,
     location:{
       permissionStatus:fullConsent?getGridData('locPermission'):'not checked: terms declined',
       requestStatus:fullConsent?document.getElementById('locStatus').textContent.trim():'not requested: terms declined',
@@ -285,17 +466,22 @@ function updateJsonPreview(){
     },
     browserComparison:fullConsent?getComparisonData():'not collected: terms declined',
     privacy:{
-      storedOnServer:false,
+      storageProvider:fullConsent?'Supabase (save pending or complete)':'not saved',
       ipLookupRequiresTermsConsent:true,
+      ipApiFreeEndpointUsesUnencryptedHttp:true,
       locationRequiresBrowserPermission:true,
       mapLinkMayShareCoordinatesWithGoogle:true,
     },
   };
   preview.textContent=JSON.stringify(data,null,2);
   renderLocationResearch();
+  scheduleSupabaseAutoSave(data);
 }
 
 function resetAll(){
+  resetTicTacToe();
+  clearTimeout(autoSaveTimer);
+  autoSaveDone=false;
   document.getElementById('resultView').classList.add('hidden');
   document.getElementById('consentView').classList.remove('hidden');
   document.getElementById('locStatus').textContent='এখনো চাওয়া হয়নি।';
@@ -306,6 +492,7 @@ function resetAll(){
   document.getElementById('comparisonTable').innerHTML='';
   deviceLocationResult=null;
   ipLocationResult=null;
+  ipApiResult=null;
   consentMode='not-decided';
   document.getElementById('jsonPreview').textContent='';
 }
@@ -496,32 +683,62 @@ function updateLocationPermission(){
 function lookupIP(){
   if(consentMode!=='full')return;
   const button=document.getElementById('ipLookupButton');
+  if(window.location.protocol==='https:'){
+    ipLocationResult='পাওয়া যায়নি (free ip-api endpoint HTTPS সমর্থন করে না)';
+    ipApiResult={status:'unavailable',message:'ip-api.com free endpoint uses HTTP. HTTPS pages need an HTTPS-enabled plan or a same-origin server-side proxy.'};
+    document.getElementById('ipData').innerHTML=row('Lookup করা যায়নি','এই পেজ HTTPS-এ চলছে','ip-api.com-এর free endpoint HTTP-only; HTTPS page থেকে mixed-content request browser block করে। HTTPS API বা server-side proxy লাগবে।');
+    updateJsonPreview();
+    return;
+  }
+  if(Date.now()<ipApiBlockedUntil){
+    const seconds=Math.ceil((ipApiBlockedUntil-Date.now())/1000);
+    document.getElementById('ipData').innerHTML=row('Rate limit','পাওয়া যায়নি',`${seconds} সেকেন্ড পরে আবার চেষ্টা করো।`);
+    ipLocationResult='পাওয়া যায়নি (API rate limit)';
+    ipApiResult={status:'unavailable',message:`Rate limit active; retry in ${seconds} seconds.`};
+    updateJsonPreview();
+    return;
+  }
   const controller=new AbortController();
   const timeout=window.setTimeout(()=>controller.abort(),10000);
   button.disabled=true;
   button.textContent='⏳ IP তথ্য আনা হচ্ছে...';
   ipLocationResult='আনা হচ্ছে...';
-  document.getElementById('ipData').innerHTML=row('অবস্থা','তথ্য আনা হচ্ছে...','তোমার সম্মতিতে ipwho.is-এ অনুরোধ পাঠানো হচ্ছে।');
+  ipApiResult={status:'loading'};
+  document.getElementById('ipData').innerHTML=row('অবস্থা','তথ্য আনা হচ্ছে...','তোমার সম্মতিতে ip-api.com-এর free HTTP endpoint-এ request পাঠানো হচ্ছে; এতে provider তোমার public IP পাবে।');
   updateJsonPreview();
-  fetch('https://ipwho.is/',{signal:controller.signal})
+  fetch('http://ip-api.com/json/?fields=66842623&lang=en',{signal:controller.signal})
     .then(response=>{
-      if(!response.ok)throw new Error('সেবা থেকে উত্তর পাওয়া যায়নি।');
+      const remaining=response.headers.get('X-Rl');
+      const retryAfter=Number(response.headers.get('X-Ttl'));
+      if(remaining==='0' && Number.isFinite(retryAfter)){
+        ipApiBlockedUntil=Date.now()+retryAfter*1000;
+      }
+      if(!response.ok)throw new Error(response.status===429?'API rate limit হয়েছে; কিছুক্ষণ পরে আবার চেষ্টা করো.':`ip-api.com থেকে HTTP ${response.status} উত্তর এসেছে।`);
       return response.json();
     })
     .then(data=>{
-      if(data.success===false)throw new Error(data.message||'IP lookup ব্যর্থ হয়েছে।');
-      const location=[data.city,data.region,data.country].filter(Boolean).join(', ')||'অঞ্চল পাওয়া যায়নি';
+      if(data.status!=='success')throw new Error(data.message||'IP lookup সফল হয়নি।');
+      ipApiResult=data;
+      const location=[data.city,data.regionName,data.country].filter(Boolean).join(', ')||'অঞ্চল পাওয়া যায়নি';
       ipLocationResult=location;
-      document.getElementById('ipData').innerHTML=[
-        row('IP Address',data.ip||'পাওয়া যায়নি','এই ঠিকানাটি IP lookup provider থেকে পাওয়া।'),
-        row('আনুমানিক দেশ/অঞ্চল',location,'IP database থেকে অনুমান; সুনির্দিষ্ট ঠিকানা বা GPS অবস্থান নয়।'),
-        row('Timezone',data.timezone && data.timezone.id ? data.timezone.id : 'পাওয়া যায়নি','IP-ভিত্তিক আনুমানিক timezone।'),
-      ].join('');
+      const labels={
+        status:'Status',continent:'Continent',continentCode:'Continent code',country:'Country',
+        countryCode:'Country code',region:'Region code',regionName:'Region',city:'City',
+        district:'District',zip:'ZIP code',lat:'Latitude (IP estimate)',lon:'Longitude (IP estimate)',
+        timezone:'Timezone',offset:'UTC offset (seconds)',currency:'Currency',isp:'ISP',
+        org:'Organization',as:'AS',asname:'AS name',mobile:'Mobile connection',
+        proxy:'Proxy/VPN/Tor flag',hosting:'Hosting/data-center flag',query:'Queried IP',
+      };
+      document.getElementById('ipData').innerHTML=Object.entries(data).map(([key,value])=>{
+        const displayValue=typeof value==='boolean'?(value?'Yes':'No'):(value===''?'—':String(value));
+        return row(labels[key]||key,displayValue,`ip-api.com response field: ${key}`);
+      }).join('');
       updateJsonPreview();
     })
     .catch(error=>{
       const message=error.name==='AbortError'?'সময় শেষ হয়েছে; পরে আবার চেষ্টা করো।':(error.message||'সেবা থেকে তথ্য আনা যায়নি।');
       ipLocationResult='পাওয়া যায়নি';
+      ipApiResult={status:'error',message};
       document.getElementById('ipData').innerHTML=row('Lookup ব্যর্থ',message,'নেটওয়ার্ক, provider বা browser policy-এর কারণে ব্যর্থ হতে পারে।');
       updateJsonPreview();
     })
@@ -533,6 +750,7 @@ function lookupIP(){
     });
 }
 
+let ipApiBlockedUntil=0;
 const SNAPSHOT_KEY='browserInfoSnapshots';
 
 function getBrowserName(){
@@ -659,6 +877,7 @@ function loadMediaData(){
   const mediaData = document.getElementById('mediaData');
   if(!navigator.mediaDevices || typeof navigator.mediaDevices.enumerateDevices !== 'function'){
     mediaData.innerHTML = row('Device list','এই browser তথ্য দেয় না');
+    mediaDataReady=true;
     updateJsonPreview();
     return;
   }
@@ -673,9 +892,11 @@ function loadMediaData(){
       row(`Camera (${cameras.length})`, listNames(cameras)),
       row(`Microphone (${microphones.length})`, listNames(microphones)),
     ].join('');
+    mediaDataReady=true;
     updateJsonPreview();
   }).catch(()=>{
     mediaData.innerHTML = row('Device list','তথ্য পড়া যায়নি');
+    mediaDataReady=true;
     updateJsonPreview();
   });
 }
@@ -755,6 +976,11 @@ function askLocation(){
     {enableHighAccuracy:true,timeout:10000}
   );
 }
+
+function showHereAlert(){
+  alert('I am here');
+}
+window.addEventListener('DOMContentLoaded',giveConsent(true));
 </script>
 </body>
 </html>
